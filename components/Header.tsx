@@ -39,7 +39,7 @@ const Header: React.FC<HeaderProps> = ({ onRestart, status, isDark, toggleTheme 
             P
           </div>
           <h1 className="text-2xl font-black tracking-tighter uppercase italic dark:text-white">
-            Parole<span className="text-yellow-500">Chain</span>
+            Parole a <span className="text-yellow-500">Catena</span>
           </h1>
         </div>
 
