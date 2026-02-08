@@ -1,0 +1,5 @@
+{
+  "name": "Parole a Catena",
+  "description": "Un gioco di parole dove ogni parola deve iniziare con le ultime due lettere della precedente. Sfida l'IA!",
+  "requestFramePermissions": []
+}
