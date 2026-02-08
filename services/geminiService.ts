@@ -39,12 +39,12 @@ export const validateWordExistence = async (word: string): Promise<boolean> => {
 
 /**
  * Generates the AI's next move using Wiktionary Search.
- * Returns a word starting with the last 2 letters of the previous word.
+ * Returns a word starting with the last N letters of the previous word.
  */
-export const generateAiMove = async (history: WordData[], lastWord: string): Promise<string | null> => {
-  const suffix = lastWord.slice(-2).toLowerCase();
+export const generateAiMove = async (history: WordData[], lastWord: string, difficulty: number): Promise<string | null> => {
+  const suffix = lastWord.slice(-difficulty).toLowerCase();
   
-  console.log(`AI thinking... searching for words starting with "${suffix}"`);
+  console.log(`AI thinking... searching for words starting with "${suffix}" (Length: ${difficulty})`);
 
   // 1. Get candidates from Wiktionary
   const candidates = await searchWordsByPrefix(suffix);

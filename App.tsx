@@ -30,6 +30,7 @@ const App: React.FC = () => {
 
   const [gameState, setGameState] = useState<GameState>({
     mode: 'ai',
+    difficulty: 2, // Default difficulty
     history: [],
     currentTurn: 'player1',
     status: 'idle',
@@ -58,8 +59,13 @@ const App: React.FC = () => {
     setSelectedWord(null);
   };
 
+  const setDifficulty = (level: number) => {
+    setGameState(prev => ({ ...prev, difficulty: level }));
+  };
+
   const startGame = (mode: GameMode) => {
-    setGameState({
+    setGameState(prev => ({
+      ...prev,
       mode,
       history: [],
       currentTurn: 'player1',
@@ -68,15 +74,17 @@ const App: React.FC = () => {
         ? 'Inizia tu! Scrivi una parola.' 
         : 'Inizia il Giocatore 1!',
       loading: false,
-    });
+    }));
     setInputWord('');
   };
 
   const validateMove = (word: string): ValidationResult => {
     const cleanWord = word.trim().toLowerCase();
     
-    if (cleanWord.length < 2) {
-      return { isValid: false, error: 'La parola è troppo corta.' };
+    // Word must be at least as long as difficulty + 1 (to have something after the prefix)
+    // Or at least simply valid length. 
+    if (cleanWord.length < gameState.difficulty + 1) {
+      return { isValid: false, error: 'Parola troppo corta.' };
     }
 
     // Check history (which is now objects)
@@ -86,7 +94,7 @@ const App: React.FC = () => {
 
     if (gameState.history.length > 0) {
       const lastWord = gameState.history[gameState.history.length - 1].text;
-      const suffix = lastWord.slice(-2).toLowerCase();
+      const suffix = lastWord.slice(-gameState.difficulty).toLowerCase();
       if (!cleanWord.startsWith(suffix)) {
         return { isValid: false, error: `Deve iniziare con "${suffix.toUpperCase()}"` };
       }
@@ -157,6 +165,7 @@ const App: React.FC = () => {
     if (gameState.mode === 'local') {
       const nextPlayer = gameState.currentTurn === 'player1' ? 'player2' : 'player1';
       setGameState({
+        ...gameState, // preserve difficulty
         mode: 'local',
         history: newHistory,
         currentTurn: nextPlayer,
@@ -168,6 +177,7 @@ const App: React.FC = () => {
     } else {
       // AI Mode
       setGameState({
+        ...gameState, // preserve difficulty
         mode: 'ai',
         history: newHistory,
         currentTurn: 'ai',
@@ -181,7 +191,8 @@ const App: React.FC = () => {
   };
 
   const handleAiTurn = async (history: any[], lastUserWord: string) => {
-    const aiWordText = await generateAiMove(history, lastUserWord);
+    // Pass difficulty level to AI service
+    const aiWordText = await generateAiMove(history, lastUserWord, gameState.difficulty);
 
     if (!aiWordText) {
       // AI Surrenders
@@ -266,14 +277,35 @@ const App: React.FC = () => {
             
             {gameState.status === 'idle' && (
                <div className="absolute inset-0 flex flex-col items-center justify-center p-8 bg-white/90 dark:bg-neutral-900/90 backdrop-blur-sm z-10 space-y-6">
-                  <h2 className="text-2xl font-black uppercase tracking-tight text-center mb-4">Scegli Modalità</h2>
+                  <h2 className="text-2xl font-black uppercase tracking-tight text-center mb-1">Scegli Modalità</h2>
+                  
+                  {/* Difficulty Selector */}
+                  <div className="flex flex-col items-center gap-2 mb-4 w-full">
+                    <span className="text-xs uppercase font-bold tracking-widest text-gray-500">Difficoltà (lettere)</span>
+                    <div className="flex gap-2 w-full justify-center max-w-xs">
+                       <button 
+                        onClick={() => setDifficulty(2)}
+                        className={`flex-1 py-2 border-2 border-black dark:border-white font-bold text-xs uppercase transition-all ${gameState.difficulty === 2 ? 'bg-black text-white dark:bg-white dark:text-black' : 'bg-white text-black dark:bg-neutral-800 dark:text-white opacity-60 hover:opacity-100'}`}
+                       >
+                         Easy (2)
+                       </button>
+                       <button 
+                        onClick={() => setDifficulty(3)}
+                        className={`flex-1 py-2 border-2 border-black dark:border-white font-bold text-xs uppercase transition-all ${gameState.difficulty === 3 ? 'bg-black text-white dark:bg-white dark:text-black' : 'bg-white text-black dark:bg-neutral-800 dark:text-white opacity-60 hover:opacity-100'}`}
+                       >
+                         Hard (3)
+                       </button>
+                    </div>
+                  </div>
+
                   <Button onClick={() => startGame('ai')} fullWidth className="max-w-xs">
                     1 vs AI
                   </Button>
                   <Button onClick={() => startGame('local')} variant="secondary" fullWidth className="max-w-xs">
                     1 vs 1 (Locale)
                   </Button>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-8 max-w-xs text-center">
+                  
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-4 max-w-xs text-center">
                     Sfida l'Intelligenza Artificiale o passa il dispositivo a un amico.
                   </p>
                </div>
@@ -292,6 +324,7 @@ const App: React.FC = () => {
                   data={wordData} 
                   index={index} 
                   gameMode={gameState.mode} 
+                  difficulty={gameState.difficulty}
                   onSelect={setSelectedWord}
                 />
               ))}
@@ -318,7 +351,7 @@ const App: React.FC = () => {
                <div className="relative flex-1">
                  {gameState.history.length > 0 && gameState.status === 'playing' && (
                    <div className="absolute -top-3 left-4 bg-yellow-300 text-black text-[10px] font-bold px-2 border border-black z-10">
-                      INIZIA CON: {gameState.history[gameState.history.length - 1].text.slice(-2).toUpperCase()}
+                      INIZIA CON: {gameState.history[gameState.history.length - 1].text.slice(-gameState.difficulty).toUpperCase()}
                    </div>
                  )}
                  <input
@@ -344,10 +377,22 @@ const App: React.FC = () => {
           </div>
         </div>
 
-        {/* Rules Summary */}
-        <div className="text-xs text-gray-500 dark:text-gray-400 text-center uppercase tracking-widest">
-          Regole: Nessuna ripetizione • Inizia con le ultime due lettere • Valide su Wiktionary
-        </div>
+        {/* Footer / Rules */}
+        <footer className="mt-auto py-4 text-center space-y-2">
+          <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-widest">
+            Regole: Nessuna ripetizione • Inizia con le ultime {gameState.difficulty} lettere
+          </div>
+          <div>
+            <a 
+              href="https://it.wiktionary.org" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-[10px] text-gray-400 dark:text-gray-500 hover:text-black dark:hover:text-white underline decoration-1 underline-offset-2 transition-colors uppercase tracking-widest"
+            >
+              Dati forniti da Wiktionary
+            </a>
+          </div>
+        </footer>
       </main>
 
       {/* Modal */}

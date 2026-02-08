@@ -5,10 +5,11 @@ interface WordCardProps {
   data: WordData;
   index: number;
   gameMode: GameMode;
+  difficulty: number;
   onSelect: (data: WordData) => void;
 }
 
-const WordCard: React.FC<WordCardProps> = ({ data, index, gameMode, onSelect }) => {
+const WordCard: React.FC<WordCardProps> = ({ data, index, gameMode, difficulty, onSelect }) => {
   // Determine alignment and label based on mode
   let isRightSide = true;
   let label = "P1";
@@ -43,8 +44,9 @@ const WordCard: React.FC<WordCardProps> = ({ data, index, gameMode, onSelect }) 
     );
   }
 
-  const suffix = data.text.slice(-2);
-  const stem = data.text.slice(0, -2);
+  // Dynamic slicing based on difficulty
+  const suffix = data.text.slice(-difficulty);
+  const stem = data.text.slice(0, -difficulty);
 
   return (
     <div className={`flex ${isRightSide ? 'justify-end' : 'justify-start'}`}>

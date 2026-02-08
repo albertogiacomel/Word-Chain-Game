@@ -12,6 +12,7 @@ export interface WordData {
 
 export interface GameState {
   mode: GameMode;
+  difficulty: number; // 2 or 3
   history: WordData[];
   currentTurn: Player;
   status: 'idle' | 'playing' | 'gameover' | 'victory';
