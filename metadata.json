@@ -1,5 +1,5 @@
 {
   "name": "Parole a Catena",
-  "description": "Un videogioco di parole dove ogni parola deve iniziare con le ultime due lettere della precedente. Sfida l'IA e fai il record!",
+  "description": "Un videogioco di parole dove ogni parola deve iniziare con le ultime lettere della precedente (2 o 3). Sfida l'IA e fai il record!",
   "requestFramePermissions": []
 }

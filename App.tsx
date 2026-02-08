@@ -28,9 +28,12 @@ const App: React.FC = () => {
 
   const toggleTheme = () => setIsDark(!isDark);
 
+  // Local state for menu selection
+  const [menuDifficulty, setMenuDifficulty] = useState<number>(2);
+
   const [gameState, setGameState] = useState<GameState>({
     mode: 'ai',
-    difficulty: 2, // Hardcoded to 2 letters as per request
+    difficulty: 2, 
     history: [],
     currentTurn: 'player1',
     status: 'idle',
@@ -63,7 +66,7 @@ const App: React.FC = () => {
     setGameState(prev => ({
       ...prev,
       mode,
-      difficulty: 2, // Ensure it is 2
+      difficulty: menuDifficulty, // Use the selected difficulty
       history: [],
       currentTurn: 'player1',
       status: 'playing',
@@ -187,7 +190,7 @@ const App: React.FC = () => {
   };
 
   const handleAiTurn = async (history: any[], lastUserWord: string) => {
-    // Pass difficulty level (2) to AI service
+    // Pass difficulty level (2 or 3) to AI service
     const aiWordText = await generateAiMove(history, lastUserWord, gameState.difficulty);
 
     if (!aiWordText) {
@@ -276,12 +279,39 @@ const App: React.FC = () => {
                <div className="absolute inset-0 flex flex-col items-center justify-center p-8 bg-white/90 dark:bg-neutral-900/90 backdrop-blur-sm z-10 space-y-6">
                   <h2 className="text-2xl font-black uppercase tracking-tight text-center mb-1">Scegli Modalità</h2>
                   
-                  <Button onClick={() => startGame('ai')} fullWidth className="max-w-xs">
-                    1 vs AI
-                  </Button>
-                  <Button onClick={() => startGame('local')} variant="secondary" fullWidth className="max-w-xs">
-                    1 vs 1 (Locale)
-                  </Button>
+                  {/* Difficulty Selector */}
+                  <div className="flex flex-col items-center gap-2 mb-2 w-full max-w-xs">
+                    <span className="text-xs font-bold uppercase tracking-widest text-gray-500 dark:text-gray-400">
+                        Difficoltà (Ultime Lettere)
+                    </span>
+                    <div className="grid grid-cols-2 gap-2 w-full">
+                        <Button 
+                            onClick={() => setMenuDifficulty(2)} 
+                            variant={menuDifficulty === 2 ? 'primary' : 'secondary'}
+                            className="!py-2 !px-2 text-xs"
+                            fullWidth
+                        >
+                            2 Lettere
+                        </Button>
+                        <Button 
+                            onClick={() => setMenuDifficulty(3)} 
+                            variant={menuDifficulty === 3 ? 'primary' : 'secondary'}
+                            className="!py-2 !px-2 text-xs"
+                            fullWidth
+                        >
+                            3 Lettere
+                        </Button>
+                    </div>
+                  </div>
+
+                  <div className="w-full max-w-xs space-y-3">
+                    <Button onClick={() => startGame('ai')} fullWidth>
+                        1 vs AI
+                    </Button>
+                    <Button onClick={() => startGame('local')} variant="secondary" fullWidth>
+                        1 vs 1 (Locale)
+                    </Button>
+                  </div>
                   
                   <div className="text-center mt-6 p-4 border-2 border-dashed border-gray-300 dark:border-neutral-700 rounded bg-white/50 dark:bg-black/50">
                     <p className="text-xs font-bold uppercase tracking-widest text-gray-500 dark:text-gray-400 mb-2">
@@ -289,7 +319,7 @@ const App: React.FC = () => {
                     </p>
                     <p className="text-sm">
                       La parola successiva deve iniziare con le<br/>
-                      <span className="font-bold bg-yellow-200 dark:bg-yellow-800 px-1 text-black dark:text-white">ULTIME 2 LETTERE</span><br/>
+                      <span className="font-bold bg-yellow-200 dark:bg-yellow-800 px-1 text-black dark:text-white">ULTIME {menuDifficulty} LETTERE</span><br/>
                       della parola precedente.
                     </p>
                   </div>
@@ -365,7 +395,7 @@ const App: React.FC = () => {
         {/* Footer / Rules */}
         <footer className="mt-auto py-4 text-center space-y-2">
           <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-widest">
-            Regole: Nessuna ripetizione • Inizia con le ultime 2 lettere
+            Regole: Nessuna ripetizione • Inizia con le ultime {gameState.difficulty} lettere
           </div>
           <div>
             <a 
