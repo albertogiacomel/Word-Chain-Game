@@ -6,9 +6,10 @@ interface HeaderProps {
   status: string;
   isDark: boolean;
   toggleTheme: () => void;
+  score: number;
 }
 
-const Header: React.FC<HeaderProps> = ({ onRestart, status, isDark, toggleTheme }) => {
+const Header: React.FC<HeaderProps> = ({ onRestart, status, isDark, toggleTheme, score }) => {
   const [isFullscreen, setIsFullscreen] = useState(false);
 
   useEffect(() => {
@@ -43,9 +44,15 @@ const Header: React.FC<HeaderProps> = ({ onRestart, status, isDark, toggleTheme 
           </h1>
         </div>
 
-        {/* Status Indicator */}
-        <div className="hidden md:block px-4 py-1 font-bold text-xs uppercase tracking-widest border border-black dark:border-white bg-gray-100 dark:bg-neutral-800 dark:text-white rounded-full transition-colors">
-           Stato: {status === 'playing' ? 'In corso' : status === 'gameover' ? 'Game Over' : 'In attesa'}
+        {/* Status & Score */}
+        <div className="flex items-center gap-4">
+            <div className="hidden md:block px-4 py-1 font-bold text-xs uppercase tracking-widest border border-black dark:border-white bg-gray-100 dark:bg-neutral-800 dark:text-white rounded-full transition-colors">
+            Stato: {status === 'playing' ? 'In corso' : status === 'gameover' ? 'Game Over' : status === 'victory' ? 'Vittoria' : 'In attesa'}
+            </div>
+            
+            <div className="px-4 py-1 font-black text-xl md:text-2xl text-black dark:text-white tabular-nums">
+                {score} <span className="text-xs font-bold text-gray-500 uppercase tracking-wider ml-1">PT</span>
+            </div>
         </div>
 
         {/* Actions */}

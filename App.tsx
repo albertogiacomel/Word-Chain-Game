@@ -30,7 +30,7 @@ const App: React.FC = () => {
 
   const [gameState, setGameState] = useState<GameState>({
     mode: 'ai',
-    difficulty: 2, // Default difficulty
+    difficulty: 2, // Hardcoded to 2 letters as per request
     history: [],
     currentTurn: 'player1',
     status: 'idle',
@@ -59,14 +59,11 @@ const App: React.FC = () => {
     setSelectedWord(null);
   };
 
-  const setDifficulty = (level: number) => {
-    setGameState(prev => ({ ...prev, difficulty: level }));
-  };
-
   const startGame = (mode: GameMode) => {
     setGameState(prev => ({
       ...prev,
       mode,
+      difficulty: 2, // Ensure it is 2
       history: [],
       currentTurn: 'player1',
       status: 'playing',
@@ -82,12 +79,11 @@ const App: React.FC = () => {
     const cleanWord = word.trim().toLowerCase();
     
     // Word must be at least as long as difficulty + 1 (to have something after the prefix)
-    // Or at least simply valid length. 
     if (cleanWord.length < gameState.difficulty + 1) {
       return { isValid: false, error: 'Parola troppo corta.' };
     }
 
-    // Check history (which is now objects)
+    // Check history
     if (gameState.history.some(h => h.text === cleanWord)) {
       return { isValid: false, error: 'Parola già utilizzata!' };
     }
@@ -165,7 +161,7 @@ const App: React.FC = () => {
     if (gameState.mode === 'local') {
       const nextPlayer = gameState.currentTurn === 'player1' ? 'player2' : 'player1';
       setGameState({
-        ...gameState, // preserve difficulty
+        ...gameState, 
         mode: 'local',
         history: newHistory,
         currentTurn: nextPlayer,
@@ -177,7 +173,7 @@ const App: React.FC = () => {
     } else {
       // AI Mode
       setGameState({
-        ...gameState, // preserve difficulty
+        ...gameState, 
         mode: 'ai',
         history: newHistory,
         currentTurn: 'ai',
@@ -191,7 +187,7 @@ const App: React.FC = () => {
   };
 
   const handleAiTurn = async (history: any[], lastUserWord: string) => {
-    // Pass difficulty level to AI service
+    // Pass difficulty level (2) to AI service
     const aiWordText = await generateAiMove(history, lastUserWord, gameState.difficulty);
 
     if (!aiWordText) {
@@ -223,11 +219,11 @@ const App: React.FC = () => {
     setGameState(prev => ({
       ...prev,
       history: [
-        ...prev.history, // Use prev.history here to be safe, though history arg is passed
+        ...prev.history, 
         {
           text: aiWordText,
           author: 'ai',
-          definitions: aiWikiResult.definitions, // Even if check fails, it returns empty array
+          definitions: aiWikiResult.definitions, 
           url: aiWikiResult.url || `https://it.wiktionary.org/wiki/${aiWordText}`,
           imageUrl: aiWikiResult.imageUrl
         }
@@ -252,6 +248,7 @@ const App: React.FC = () => {
         status={gameState.status} 
         isDark={isDark}
         toggleTheme={toggleTheme}
+        score={gameState.history.filter(h => !h.isSurrender).length}
       />
 
       <main className="flex-1 max-w-2xl w-full mx-auto p-4 flex flex-col gap-6">
@@ -279,25 +276,6 @@ const App: React.FC = () => {
                <div className="absolute inset-0 flex flex-col items-center justify-center p-8 bg-white/90 dark:bg-neutral-900/90 backdrop-blur-sm z-10 space-y-6">
                   <h2 className="text-2xl font-black uppercase tracking-tight text-center mb-1">Scegli Modalità</h2>
                   
-                  {/* Difficulty Selector */}
-                  <div className="flex flex-col items-center gap-2 mb-4 w-full">
-                    <span className="text-xs uppercase font-bold tracking-widest text-gray-500">Difficoltà (lettere)</span>
-                    <div className="flex gap-2 w-full justify-center max-w-xs">
-                       <button 
-                        onClick={() => setDifficulty(2)}
-                        className={`flex-1 py-2 border-2 border-black dark:border-white font-bold text-xs uppercase transition-all ${gameState.difficulty === 2 ? 'bg-black text-white dark:bg-white dark:text-black' : 'bg-white text-black dark:bg-neutral-800 dark:text-white opacity-60 hover:opacity-100'}`}
-                       >
-                         Easy (2)
-                       </button>
-                       <button 
-                        onClick={() => setDifficulty(3)}
-                        className={`flex-1 py-2 border-2 border-black dark:border-white font-bold text-xs uppercase transition-all ${gameState.difficulty === 3 ? 'bg-black text-white dark:bg-white dark:text-black' : 'bg-white text-black dark:bg-neutral-800 dark:text-white opacity-60 hover:opacity-100'}`}
-                       >
-                         Hard (3)
-                       </button>
-                    </div>
-                  </div>
-
                   <Button onClick={() => startGame('ai')} fullWidth className="max-w-xs">
                     1 vs AI
                   </Button>
@@ -305,9 +283,16 @@ const App: React.FC = () => {
                     1 vs 1 (Locale)
                   </Button>
                   
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-4 max-w-xs text-center">
-                    Sfida l'Intelligenza Artificiale o passa il dispositivo a un amico.
-                  </p>
+                  <div className="text-center mt-6 p-4 border-2 border-dashed border-gray-300 dark:border-neutral-700 rounded bg-white/50 dark:bg-black/50">
+                    <p className="text-xs font-bold uppercase tracking-widest text-gray-500 dark:text-gray-400 mb-2">
+                       Regola Principale
+                    </p>
+                    <p className="text-sm">
+                      La parola successiva deve iniziare con le<br/>
+                      <span className="font-bold bg-yellow-200 dark:bg-yellow-800 px-1 text-black dark:text-white">ULTIME 2 LETTERE</span><br/>
+                      della parola precedente.
+                    </p>
+                  </div>
                </div>
             )}
 
@@ -380,7 +365,7 @@ const App: React.FC = () => {
         {/* Footer / Rules */}
         <footer className="mt-auto py-4 text-center space-y-2">
           <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-widest">
-            Regole: Nessuna ripetizione • Inizia con le ultime {gameState.difficulty} lettere
+            Regole: Nessuna ripetizione • Inizia con le ultime 2 lettere
           </div>
           <div>
             <a 
