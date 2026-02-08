@@ -2,9 +2,8 @@ import { GoogleGenAI, Type } from "@google/genai";
 import { WordData } from "../types";
 import { searchWordsByPrefix } from "./wiktionaryService";
 
-// Ensure API key is available (Kept for fallback or validation if needed in future)
-const apiKey = process.env.API_KEY || '';
-const ai = new GoogleGenAI({ apiKey });
+// Ensure API key is obtained exclusively from process.env.API_KEY
+const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
 const MODEL_NAME = 'gemini-3-flash-preview'; 
 
@@ -12,7 +11,7 @@ const MODEL_NAME = 'gemini-3-flash-preview';
  * Validates if a word is a real Italian word using AI (Fallback).
  */
 export const validateWordExistence = async (word: string): Promise<boolean> => {
-  if (!apiKey) return true;
+  if (!process.env.API_KEY) return true;
 
   try {
     const response = await ai.models.generateContent({
