@@ -25,3 +25,13 @@ jobs:
           path: |
             artifacts/game-kit/*.json
             artifacts/game-kit/*.png
+
+  publish:
+    needs: verify
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    uses: albertogiacomel/AgentPippo/.github/workflows/recover-games.yml@b15cfd842fd9f1d6f3553ec3500342f1ed693ac0
+    with:
+      game: Word-Chain-Game
+      source_ref: ${{ github.sha }}
+    secrets:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
