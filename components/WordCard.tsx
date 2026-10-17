@@ -27,7 +27,7 @@ const WordCard: React.FC<WordCardProps> = ({ data, index, gameMode, difficulty, 
   // Handle Surrender Card Styling
   if (data.isSurrender) {
     return (
-      <div className={`flex ${isRightSide ? 'justify-end' : 'justify-start'} animate-bounce`}>
+      <div className="ag-equal-items grid grid-cols-1">
         <div 
           className={`
             relative px-6 py-3 border-2 border-black dark:border-white 
@@ -51,12 +51,12 @@ const WordCard: React.FC<WordCardProps> = ({ data, index, gameMode, difficulty, 
   const stem = data.text.slice(0, -difficulty);
 
   return (
-    <div className={`flex ${isRightSide ? 'justify-end' : 'justify-start'}`}>
+    <div className="ag-equal-items grid grid-cols-1">
       <button 
         type="button"
         onClick={() => onSelect(data)}
         className={`
-          relative max-w-[80%] px-4 py-2 border-2 border-black dark:border-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,1)]
+          relative w-full px-4 py-2 border-2 border-black dark:border-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,1)]
           hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] dark:hover:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)]
           hover:translate-x-[2px] hover:translate-y-[2px] 
           active:shadow-none active:translate-x-[4px] active:translate-y-[4px]
