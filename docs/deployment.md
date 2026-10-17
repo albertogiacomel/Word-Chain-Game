@@ -1,7 +1,7 @@
 # Pubblicazione Cloudflare
 
 Il Worker serve https://wordchain.giacomel.info/. I push su main eseguono prima i test
-e poi il workflow riutilizzabile di AgentPippo, fissato al commit b15cfd842fd9f1d6f3553ec3500342f1ed693ac0.
+e poi il workflow riutilizzabile di AgentPippo, fissato alla versione indicata in .github/workflows/ci.yml.
 Il repository possiede il proprio secret cifrato CLOUDFLARE_API_TOKEN, installato
 tramite ciphertext per la chiave pubblica GitHub del destinatario. Il token in
 chiaro non è stato esportato dal runner sorgente.
