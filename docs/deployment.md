@@ -1,7 +1,8 @@
 # Pubblicazione Cloudflare
 
-Il Worker serve https://wordchain.giacomel.info/. I push su main eseguono prima i test
-e poi il workflow riutilizzabile di AgentPippo, fissato alla versione indicata in .github/workflows/ci.yml.
+Il Worker serve https://wordchain.giacomel.info/. I push su main attivano i test GitHub e il deploy Git nativo Cloudflare,
+il cui controllo Workers Builds è tornato success dopo la ricreazione.
+Il workflow riutilizzabile di AgentPippo è un percorso di recupero manuale, fissato alla versione indicata in .github/workflows/ci.yml.
 Il repository possiede il proprio secret cifrato CLOUDFLARE_API_TOKEN, installato
 tramite ciphertext per la chiave pubblica GitHub del destinatario. Il token in
 chiaro non è stato esportato dal runner sorgente.
@@ -22,3 +23,7 @@ sono recuperabili attraverso il nuovo Worker.
 Artifact per ogni esecuzione: ricevute prima/dopo, confronto HTTP e screenshot.
 Lo script di sicurezza Cloudflare può modificare l’HTML; resta attivo. I bundle
 applicativi devono corrispondere esattamente alla build e il gameplay deve passare.
+
+Per evitare deploy concorrenti, il job GitHub publish parte solo da
+workflow_dispatch su main. I normali push lasciano la pubblicazione al
+collegamento Git di Cloudflare, verificando separatamente entrambi i controlli.

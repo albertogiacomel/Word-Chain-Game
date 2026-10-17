@@ -1,6 +1,6 @@
 > Impostazioni e controlli condivisi: [integrazione Videogames Kit](docs/videogames-kit.md).
 
-Pubblicazione automatica: [configurazione e verifiche](docs/deployment.md).
+Pubblicazione Cloudflare: [configurazione e verifiche](docs/deployment.md).
 
 # Parole a Catena (Word Chain Game)
 

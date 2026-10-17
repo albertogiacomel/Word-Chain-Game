@@ -1,5 +1,5 @@
 name: Verify Word-Chain-Game
-on: [push, pull_request]
+on: [push, pull_request, workflow_dispatch]
 permissions:
   contents: read
 jobs:
@@ -28,7 +28,7 @@ jobs:
 
   publish:
     needs: verify
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
     uses: albertogiacomel/AgentPippo/.github/workflows/recover-games.yml@23dae6d92efe87f2da341ecacd95aa822ddb3cae
     with:
       game: Word-Chain-Game
