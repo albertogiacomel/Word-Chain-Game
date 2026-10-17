@@ -7,8 +7,11 @@ tramite ciphertext per la chiave pubblica GitHub del destinatario. Il token in
 chiaro non è stato esportato dal runner sorgente.
 
 Il workflow pubblica il commit esatto collaudato, conserva la versione precedente,
-verifica SHA256 dei bundle JS/CSS e gameplay reale sul dominio pubblico. In caso
-di fallimento live ripristina la versione precedente, quando esiste.
+verifica via API autenticata che sia attivo il tag del commit collaudato. In caso
+di errore di deployment ripristina la versione precedente, quando esiste.
+La verifica pubblica di SHA256 e gameplay viene eseguita separatamente da una
+postazione che accede al sito e registrata sul commit. Il probe pubblico del
+runner è opzionale: le protezioni Cloudflare possono impedirgli l’accesso.
 
 I due vecchi Worker sono stati cancellati manualmente dal proprietario e ricreati
 con gli stessi nomi e domini. La nuova distribuzione passa da GitHub Actions;

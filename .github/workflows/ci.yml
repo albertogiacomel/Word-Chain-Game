@@ -29,7 +29,7 @@ jobs:
   publish:
     needs: verify
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    uses: albertogiacomel/AgentPippo/.github/workflows/recover-games.yml@38146ebbf432660eeefc42e5c5e71a59a5d1775c
+    uses: albertogiacomel/AgentPippo/.github/workflows/recover-games.yml@23dae6d92efe87f2da341ecacd95aa822ddb3cae
     with:
       game: Word-Chain-Game
       source_ref: ${{ github.sha }}
