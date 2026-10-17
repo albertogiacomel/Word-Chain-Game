@@ -3,5 +3,12 @@
   "compatibility_date": "2024-11-01",
   "assets": {
     "directory": "./dist"
-  }
+  },
+  "workers_dev": true,
+  "routes": [
+    {
+      "pattern": "wordchain.giacomel.info",
+      "custom_domain": true
+    }
+  ]
 }
