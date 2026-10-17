@@ -1,3 +1,5 @@
+> Impostazioni e controlli condivisi: [integrazione Videogames Kit](docs/videogames-kit.md).
+
 # Parole a Catena (Word Chain Game)
 
 Un videogioco di parole moderno e minimalista sviluppato con React, dove ogni parola deve iniziare con le ultime lettere della precedente. Sfida i tuoi amici o l'Intelligenza Artificiale.

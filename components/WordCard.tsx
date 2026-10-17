@@ -1,3 +1,4 @@
+import {useWordUI} from '../shared/word-ui';
 import React from 'react';
 import { WordData, GameMode } from '../types';
 
@@ -10,13 +11,14 @@ interface WordCardProps {
 }
 
 const WordCard: React.FC<WordCardProps> = ({ data, index, gameMode, difficulty, onSelect }) => {
+  const ui=useWordUI();
   // Determine alignment and label based on mode
   let isRightSide = true;
   let label = "P1";
 
   if (gameMode === 'ai') {
     isRightSide = index % 2 === 0; // Even = Player, Odd = AI
-    label = isRightSide ? "TU" : "CPU";
+    label = isRightSide ? ui("TU") : "CPU";
   } else {
     isRightSide = index % 2 === 0; // Even = P1, Odd = P2
     label = isRightSide ? "P1" : "P2";
@@ -34,10 +36,10 @@ const WordCard: React.FC<WordCardProps> = ({ data, index, gameMode, difficulty, 
             transform rotate-2
           `}
         >
-          <div className="text-[10px] opacity-80 mb-1">{label} HA MOLLATO</div>
+          <div className="text-[10px] opacity-80 mb-1">{label} {ui("HA MOLLATO")}</div>
           <div className="flex items-center gap-2 text-xl">
             <span>🏳️</span>
-            <span>{data.text}</span>
+            <span>{ui(data.text)}</span>
           </div>
         </div>
       </div>

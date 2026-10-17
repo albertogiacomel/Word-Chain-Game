@@ -1,3 +1,5 @@
+import {useWordUI} from './shared/word-ui';
+import {useGamePreferences} from './shared/game-kit';
 import React, { useState, useEffect, useRef } from 'react';
 import Header from './components/Header';
 import Button from './components/Button';
@@ -8,28 +10,10 @@ import { generateAiMove } from './services/geminiService';
 import { checkWiktionary } from './services/wiktionaryService';
 
 const App: React.FC = () => {
-  // Theme State
-  const [isDark, setIsDark] = useState<boolean>(() => {
-    const saved = localStorage.getItem('theme');
-    if (saved) return saved === 'dark';
-    return window.matchMedia('(prefers-color-scheme: dark)').matches;
-  });
-
-  // Apply Theme Effect
-  useEffect(() => {
-    if (isDark) {
-      document.documentElement.classList.add('dark');
-      localStorage.setItem('theme', 'dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-      localStorage.setItem('theme', 'light');
-    }
-  }, [isDark]);
-
-  const toggleTheme = () => setIsDark(!isDark);
-
-  // Local state for menu selection
-  const [menuDifficulty, setMenuDifficulty] = useState<number>(2);
+  const ui=useWordUI();
+  const {store: kitStore, preferences: kitPreferences} = useGamePreferences('word-chain');
+  const menuDifficulty = Number(kitPreferences.difficulty);
+  const setMenuDifficulty = (value: number) => kitStore.update({difficulty:String(value)});
 
   const [gameState, setGameState] = useState<GameState>({
     mode: 'ai',
@@ -239,9 +223,9 @@ const App: React.FC = () => {
   };
 
   const getPlaceholder = () => {
-    if (gameState.status !== 'playing') return "Partita non attiva";
-    if (gameState.mode === 'ai') return "Scrivi la tua parola...";
-    return gameState.currentTurn === 'player1' ? "Turno Giocatore 1..." : "Turno Giocatore 2...";
+    if (gameState.status !== 'playing') return ui("Partita non attiva");
+    if (gameState.mode === 'ai') return ui("Scrivi la tua parola...");
+    return gameState.currentTurn === 'player1' ? ui("Turno Giocatore 1...") : ui("Turno Giocatore 2...");
   };
 
   return (
@@ -249,8 +233,6 @@ const App: React.FC = () => {
       <Header 
         onRestart={resetGame} 
         status={gameState.status} 
-        isDark={isDark}
-        toggleTheme={toggleTheme}
         score={gameState.history.filter(h => !h.isSurrender).length}
       />
 
@@ -268,7 +250,7 @@ const App: React.FC = () => {
           }`}>
              <div className={`w-3 h-3 rounded-full bg-black dark:bg-white ${gameState.loading ? 'animate-ping' : ''}`}></div>
              <p className="font-bold text-sm uppercase tracking-tight flex-1 truncate">
-               {gameState.message}
+               {ui(gameState.message)}
              </p>
           </div>
 
@@ -277,12 +259,12 @@ const App: React.FC = () => {
             
             {gameState.status === 'idle' && (
                <div className="absolute inset-0 flex flex-col items-center justify-center p-8 bg-white/90 dark:bg-neutral-900/90 backdrop-blur-sm z-10 space-y-6">
-                  <h2 className="text-2xl font-black uppercase tracking-tight text-center mb-1">Scegli Modalità</h2>
+                  <h2 className="text-2xl font-black uppercase tracking-tight text-center mb-1">{ui("Scegli Modalità")}</h2>
                   
                   {/* Difficulty Selector */}
                   <div className="flex flex-col items-center gap-2 mb-2 w-full max-w-xs">
                     <span className="text-xs font-bold uppercase tracking-widest text-gray-500 dark:text-gray-400">
-                        Difficoltà (Ultime Lettere)
+                        {ui("Difficoltà (Ultime Lettere)")}
                     </span>
                     <div className="grid grid-cols-2 gap-2 w-full">
                         <Button 
@@ -291,7 +273,7 @@ const App: React.FC = () => {
                             className="!py-2 !px-2 text-xs"
                             fullWidth
                         >
-                            2 Lettere
+                            {ui("2 Lettere")}
                         </Button>
                         <Button 
                             onClick={() => setMenuDifficulty(3)} 
@@ -299,28 +281,28 @@ const App: React.FC = () => {
                             className="!py-2 !px-2 text-xs"
                             fullWidth
                         >
-                            3 Lettere
+                            {ui("3 Lettere")}
                         </Button>
                     </div>
                   </div>
 
                   <div className="w-full max-w-xs space-y-3">
                     <Button onClick={() => startGame('ai')} fullWidth>
-                        1 vs AI
+                        {ui("1 vs AI")}
                     </Button>
                     <Button onClick={() => startGame('local')} variant="secondary" fullWidth>
-                        1 vs 1 (Locale)
+                        {ui("1 vs 1 (Locale)")}
                     </Button>
                   </div>
                   
                   <div className="text-center mt-6 p-4 border-2 border-dashed border-gray-300 dark:border-neutral-700 rounded bg-white/50 dark:bg-black/50">
                     <p className="text-xs font-bold uppercase tracking-widest text-gray-500 dark:text-gray-400 mb-2">
-                       Regola Principale
+                       {ui("Regola Principale")}
                     </p>
                     <p className="text-sm">
-                      La parola successiva deve iniziare con le<br/>
-                      <span className="font-bold bg-yellow-200 dark:bg-yellow-800 px-1 text-black dark:text-white">ULTIME {menuDifficulty} LETTERE</span><br/>
-                      della parola precedente.
+                      {ui("La parola successiva deve iniziare con le")}<br/>
+                      <span className="font-bold bg-yellow-200 dark:bg-yellow-800 px-1 text-black dark:text-white">{ui("ULTIME")} {menuDifficulty} {ui("LETTERE")}</span><br/>
+                      {ui("della parola precedente.")}
                     </p>
                   </div>
                </div>
@@ -328,7 +310,7 @@ const App: React.FC = () => {
 
             {gameState.status !== 'idle' && gameState.history.length === 0 && (
               <div className="text-center text-gray-400 italic mt-10">
-                La tavola è vuota. Scrivi la prima parola!
+                {ui("La tavola è vuota. Scrivi la prima parola!")}
               </div>
             )}
 
@@ -356,7 +338,7 @@ const App: React.FC = () => {
                  <button 
                   type="button" 
                   onClick={handleSurrender}
-                  title="Mi arrendo"
+                  title={ui("Mi arrendo")}
                   className="px-3 border-2 border-black dark:border-white bg-red-100 hover:bg-red-200 dark:bg-red-900/30 dark:hover:bg-red-900/50 transition-colors"
                  >
                    🏳️
@@ -366,7 +348,7 @@ const App: React.FC = () => {
                <div className="relative flex-1">
                  {gameState.history.length > 0 && gameState.status === 'playing' && (
                    <div className="absolute -top-3 left-4 bg-yellow-300 text-black text-[10px] font-bold px-2 border border-black z-10">
-                      INIZIA CON: {gameState.history[gameState.history.length - 1].text.slice(-gameState.difficulty).toUpperCase()}
+                      {ui("INIZIA CON:")} {gameState.history[gameState.history.length - 1].text.slice(-gameState.difficulty).toUpperCase()}
                    </div>
                  )}
                  <input
@@ -386,7 +368,7 @@ const App: React.FC = () => {
                 disabled={gameState.status !== 'playing' || !inputWord || (gameState.mode === 'ai' && gameState.currentTurn === 'ai') || gameState.loading}
                 className="h-12 !px-6 sm:!px-8"
                >
-                 INVIA
+                 {ui("INVIA")}
                </Button>
             </form>
           </div>
@@ -395,7 +377,7 @@ const App: React.FC = () => {
         {/* Footer / Rules */}
         <footer className="mt-auto py-4 text-center space-y-2">
           <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-widest">
-            Regole: Nessuna ripetizione • Inizia con le ultime {gameState.difficulty} lettere
+            {ui("Regole: Nessuna ripetizione • Inizia con le ultime")} {gameState.difficulty} {ui("lettere")}
           </div>
           <div>
             <a 
@@ -404,7 +386,7 @@ const App: React.FC = () => {
               rel="noopener noreferrer"
               className="text-[10px] text-gray-400 dark:text-gray-500 hover:text-black dark:hover:text-white underline decoration-1 underline-offset-2 transition-colors uppercase tracking-widest"
             >
-              Dati forniti da Wiktionary
+              {ui("Dati forniti da Wiktionary")}
             </a>
           </div>
         </footer>

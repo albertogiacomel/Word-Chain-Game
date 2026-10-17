@@ -1,3 +1,4 @@
+import {useWordUI} from '../shared/word-ui';
 import React, { useEffect } from 'react';
 import Button from './Button';
 import { WordData } from '../types';
@@ -8,6 +9,7 @@ interface WordDetailModalProps {
 }
 
 const WordDetailModal: React.FC<WordDetailModalProps> = ({ wordData, onClose }) => {
+  const ui=useWordUI();
   
   // Close on Escape key
   useEffect(() => {
@@ -62,7 +64,7 @@ const WordDetailModal: React.FC<WordDetailModalProps> = ({ wordData, onClose }) 
           <div className="p-6 space-y-4 text-black dark:text-white">
             <div>
               <div className="inline-block bg-black dark:bg-white text-white dark:text-black text-[10px] font-bold px-2 py-0.5 uppercase tracking-widest mb-2">
-                Definizioni
+                {ui("Definizioni")}
               </div>
               
               {wordData.definitions.length > 0 ? (
@@ -79,7 +81,7 @@ const WordDetailModal: React.FC<WordDetailModalProps> = ({ wordData, onClose }) 
                   ))}
                 </ul>
               ) : (
-                <p className="italic text-gray-500">Nessuna definizione testuale trovata.</p>
+                <p className="italic text-gray-500">{ui("Nessuna definizione testuale trovata.")}</p>
               )}
             </div>
 
@@ -91,14 +93,14 @@ const WordDetailModal: React.FC<WordDetailModalProps> = ({ wordData, onClose }) 
                   fullWidth
                   className="!py-2 text-xs"
                 >
-                  Apri su Wiktionary ↗
+                  {ui("Apri su Wiktionary ↗")}
                 </Button>
                 <Button 
                   onClick={onClose}
                   fullWidth
                   className="!py-2 text-xs"
                 >
-                  Chiudi
+                  {ui("Chiudi")}
                 </Button>
               </div>
             </div>
