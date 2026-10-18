@@ -1,6 +1,7 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { WordData } from "../types";
 import { searchWordsByPrefix } from "./wiktionaryService";
+import { hasOptionalConsent } from '../shared/site-privacy';
 
 // Initialize AI only if API key is present to prevent runtime crashes
 const apiKey = process.env.API_KEY;
@@ -12,8 +13,7 @@ const MODEL_NAME = 'gemini-3-flash-preview';
  * Validates if a word is a real Italian word using AI (Fallback).
  */
 export const validateWordExistence = async (word: string): Promise<boolean> => {
-  if (!ai) {
-    console.warn("AI Key missing, skipping AI validation.");
+  if (!ai || !hasOptionalConsent('google-ai')) {
     return true;
   }
 
