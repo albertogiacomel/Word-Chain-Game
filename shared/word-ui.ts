@@ -1,5 +1,5 @@
 import {useGamePreferences} from './game-kit';
-import {I18n} from './videogames-kit/src/index.mjs';
+import {I18n} from './videogames-kit/src/index.js';
 const english: Record<string,string> = {
   "Seleziona una modalità per iniziare": "Choose a mode to start",
   "Inizia tu! Scrivi una parola.": "You start! Enter a word.",
